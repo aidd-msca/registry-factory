@@ -1,15 +1,35 @@
 [tool.poetry]
 name = "abstract-codebase"
 version = "0.1.0"
-description = ""
-authors = ["svensson <svensson@ml.jku.at>"]
+description = "Abstract codebase with utilities to register generic modules."
+authors = ["Peter Hartog <peter.hartog@hotmail.nl>", "Emma Svensson <svensson@ml.jku.at>"]
+license = "MIT"
 readme = "README.md"
+homepage = "https://github.com/aidd-msca/abstract-codebase"
+repository = "https://github.com/aidd-msca/abstract-codebase"
+keywords = [codebase, module registry, accreditation system]
+classifiers = [
+    "Development Status :: 2 - Pre-Alpha",
+    "Environment :: GPU :: NVIDIA CUDA :: 11.4",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+include = [
+    "LICENSE",
+]
 packages = [{include = "abstract_codebase"}]
 
 [tool.poetry.dependencies]
 python = "^3.8"
 
+# A list of all of the optional dependencies, some of which are included in the
+# below `extras`. They can be opted into by apps.
+#yaml = { version = "^2.6", optional = true }
+#hypdra = { version = "^0.12.16", optional = true }
+
+[tool.poetry.dev-dependencies]
+pytest = "^5.2"
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
