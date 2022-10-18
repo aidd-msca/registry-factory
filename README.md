@@ -16,8 +16,7 @@ $ pip install abstract-codebase
 
 ## Dependencies
 
-- yaml
-- Optionally, hypdra in case of utilizing the configuration setup.
+No dependencies to use the minimal Registry functionality. The configuration setup depends on yaml and hydra.
 
 ## Usage
 
@@ -69,11 +68,10 @@ class SimpleModel(nn.Module):
 Each registered module can be accompanied with a dataclass of settings with default values. 
 
 ``` Python
-from abstract_codebase.config import _ABCDataClass
 
 @ModelRegistry.register(call_name="simple_model")  
 @dataclass(unsafe_hash=True)
-class SimpleModelArguments(_ABCDataClass):
+class SimpleModelArguments():
 
     dropout_rate = 0.25
 ```
