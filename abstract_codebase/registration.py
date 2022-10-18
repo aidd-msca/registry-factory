@@ -33,7 +33,7 @@ class RegistrationWarning(Warning):
 
 
 class RegistryFactory:
-    """Factory to generate a registries."""
+    """Factory to generate a registry."""
 
     index: Dict[str, object] = UniqueDict()
     arguments: Dict[str, Dataclass] = UniqueDict()
