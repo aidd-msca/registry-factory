@@ -89,18 +89,15 @@ class RegistryFactory:
         if key in cls.index:
             warnings.warn(RegistrationWarning(f"{key} is already registered to {cls.index[key]}."))
 
-        def decorator(obj):
-            @wraps(obj)
-            def wrapper(obj: object) -> object:
-                """Register the object to the key."""
-                cls.index[key] = obj
-                if credit is not None:
-                    cls.accreditation.add_credit(key, credit, credit_type)
-                return obj
+        def wrapper(obj: object) -> object:
+            """Register the object to the key."""
+            cls.index[key] = obj
+            if credit is not None:
+                cls.accreditation.add_credit(key, credit, credit_type)
+            return obj
 
-            return wrapper
+        return wrapper
 
-        return decorator
 
     @classmethod
     def register_prebuilt(
@@ -112,16 +109,13 @@ class RegistryFactory:
     @classmethod
     def register_arguments(cls, key: str) -> Callable:
         """Register the arguments to the key."""
+        
+        def wrapper(argument_class: Dataclass) -> Any:
+            cls.arguments[key] = argument_class
+            return argument_class
 
-        def decorator(obj):
-            @wraps(obj)
-            def wrapper(argument_class: Dataclass) -> Any:
-                cls.arguments[key] = argument_class
-                return argument_class
+        return wrapper
 
-            return wrapper
-
-        return decorator
 
     @classmethod
     def get_arguments(cls, key: str) -> Dataclass:
