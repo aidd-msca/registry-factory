@@ -1,11 +1,15 @@
 """Registration factory module for a codebase."""
 import warnings
-from functools import wraps
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
 from abstract_codebase.accreditation import Accreditation, CreditInfo, CreditType
 from abstract_codebase.metacoding import UniqueDict
 from abstract_codebase.typescripts import Dataclass
+
+
+# TODO
+# Add reset method to RegistryFactory
+# Add test cases for reset method
 
 
 class RegistrationError(Exception):
@@ -14,6 +18,7 @@ class RegistrationError(Exception):
     def __init__(self, message: str):
         """Initialize the RegistrationError."""
         super().__init__(message)
+        self.message = message
 
     def __str__(self):
         """Return the string representation of the RegistrationError."""
@@ -26,6 +31,7 @@ class RegistrationWarning(Warning):
     def __init__(self, message: str):
         """Initialize the RegistrationWarning."""
         super().__init__(message)
+        self.message = message
 
     def __str__(self):
         """Return the string representation of the RegistrationWarning."""
@@ -79,15 +85,19 @@ class RegistryFactory:
     def get(cls, key: str, default: Optional[object] = None) -> object:
         """Return the object registered to the key."""
         cls.accreditation.called(key)
+        cls.validate_choice(key)
         return cls.index.get(key, default)
 
     @classmethod
     def register(
-        cls, key: str, credit: Optional[CreditInfo] = None, credit_type: CreditType = CreditType.NONE,
+        cls,
+        key: str,
+        credit: Optional[CreditInfo] = None,
+        credit_type: CreditType = CreditType.NONE,
     ) -> Callable:
         """Register the object to the key with the option to use as a decorator."""
-        if key in cls.index:
-            warnings.warn(RegistrationWarning(f"{key} is already registered to {cls.index[key]}."))
+        # if key in cls.index:
+        #     warnings.warn(RegistrationWarning(f"{key} is already registered to {cls.index[key]}."))
 
         def wrapper(obj: object) -> object:
             """Register the object to the key."""
@@ -98,10 +108,13 @@ class RegistryFactory:
 
         return wrapper
 
-
     @classmethod
     def register_prebuilt(
-        cls, obj: object, key: str, credit: Optional[CreditInfo] = None, credit_type: CreditType = CreditType.NONE,
+        cls,
+        obj: object,
+        key: str,
+        credit: Optional[CreditInfo] = None,
+        credit_type: CreditType = CreditType.NONE,
     ):
         """Register the object to the key."""
         cls.register(key, credit, credit_type)(obj)
@@ -109,13 +122,12 @@ class RegistryFactory:
     @classmethod
     def register_arguments(cls, key: str) -> Callable:
         """Register the arguments to the key."""
-        
+
         def wrapper(argument_class: Dataclass) -> Any:
             cls.arguments[key] = argument_class
             return argument_class
 
         return wrapper
-
 
     @classmethod
     def get_arguments(cls, key: str) -> Dataclass:
@@ -147,7 +159,7 @@ class RegistryFactory:
     def check_choice(cls, key: str) -> bool:
         """Checks if a choice is valid and returns a bool."""
         if key not in cls.index.keys():
-            RegistrationWarning(f"{key} is not a valid choice.")
+            warnings.warn(RegistrationWarning(f"{key} is not a valid choice."))
             return False
         return True
 
@@ -155,7 +167,7 @@ class RegistryFactory:
     def validate_choice(cls, key: str) -> None:
         """Checks if a choice is valid and stops if not."""
         if key not in cls.index.keys():
-            RegistrationError(f"{key} is not a valid choice.")
+            raise RegistrationError(f"{key} is not a valid choice.")
 
     @classmethod
     def get_subclass_arguments(cls, argument_classes: Dict[str, Dict]) -> Dict[str, Any]:
