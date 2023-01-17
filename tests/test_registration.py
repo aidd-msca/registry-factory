@@ -8,10 +8,6 @@ from abstract_codebase.registration import (
     RegistryFactory,
 )
 
-# TODO
-# Add reset method to RegistryFactory
-# Add test cases for reset method
-
 
 class TestIndividualRegistry:
     """Test cases for a newly created Registry class."""
