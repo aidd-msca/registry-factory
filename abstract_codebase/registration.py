@@ -10,6 +10,17 @@ from abstract_codebase.typescripts import Dataclass
 # TODO
 # Add reset method to RegistryFactory
 # Add test cases for reset method
+# add sharing using @property
+# add accreditation with custom credit type
+# add forced accreditation
+# add versioning
+# add versioning with custom version type
+# add forced versioning
+# add factory pattern
+# add factory pattern with custom factory type
+# add forced factory pattern
+# add forced arguments
+# add automatic init arguments
 
 
 class RegistrationError(Exception):
