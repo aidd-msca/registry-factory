@@ -1,16 +1,16 @@
 """Registration factory module for a codebase."""
+from abc import ABC
 import warnings
-from typing import Any, Callable, Dict, List, Optional, Tuple
+from typing import Any, Callable, Dict, List, Optional, Tuple, Type
 
-from abstract_codebase.accreditation import Accreditation, CreditInfo, CreditType
-from abstract_codebase.metacoding import UniqueDict
+from abstract_codebase.accreditation import Accreditation
+from abstract_codebase.index import IndexDict, SharedIndexDict
+from abstract_codebase.postchecks import AbstractPostCheck
 from abstract_codebase.typescripts import Dataclass
 
 
 # TODO
-# Add reset method to RegistryFactory
 # Add test cases for reset method
-# add sharing using @property
 # add accreditation with custom credit type
 # add forced accreditation
 # add versioning
@@ -49,11 +49,11 @@ class RegistrationWarning(Warning):
         return f"RegistrationWarning: {self.message}"
 
 
-class RegistryFactory:
-    """Factory to generate a registry."""
+class AbstractRegistry(ABC):
+    """Abstract class to generate a registry."""
 
-    index: Dict[str, object] = UniqueDict()
-    arguments: Dict[str, Dataclass] = UniqueDict()
+    index: Dict[str, Callable]
+    arguments: Dict[str, Dataclass]
 
     accreditation: Accreditation = Accreditation()
 
@@ -93,42 +93,55 @@ class RegistryFactory:
         return f"{cls.__name__}({cls.index})"
 
     @classmethod
-    def get(cls, key: str, default: Optional[object] = None) -> object:
+    def get(cls, key: str, default: Optional[object] = None, **kwargs) -> object:
         """Return the object registered to the key."""
-        cls.accreditation.called(key)
-        cls.validate_choice(key)
-        return cls.index.get(key, default)
+        if default is None:
+            cls.validate_choice(key, **kwargs)
+            return cls.index[key]
+        else:
+            cls.check_choice(key, **kwargs)
+            return cls.index.get(key, default)
 
     @classmethod
-    def register(
-        cls,
-        key: str,
-        credit: Optional[CreditInfo] = None,
-        credit_type: CreditType = CreditType.NONE,
-    ) -> Callable:
+    def register(cls, key: str, **kwargs) -> Callable:
         """Register the object to the key with the option to use as a decorator."""
-        # if key in cls.index:
-        #     warnings.warn(RegistrationWarning(f"{key} is already registered to {cls.index[key]}."))
 
-        def wrapper(obj: object) -> object:
+        def wrapper(obj: Callable) -> Callable:
             """Register the object to the key."""
-            cls.index[key] = obj
-            if credit is not None:
-                cls.accreditation.add_credit(key, credit, credit_type)
+            cls.index[key] = obj  # **kwargs)
             return obj
 
         return wrapper
 
     @classmethod
-    def register_prebuilt(
-        cls,
-        obj: object,
-        key: str,
-        credit: Optional[CreditInfo] = None,
-        credit_type: CreditType = CreditType.NONE,
-    ):
+    def register_prebuilt(cls, obj: object, key: str, **kwargs):
         """Register the object to the key."""
-        cls.register(key, credit, credit_type)(obj)
+        cls.register(key, **kwargs)(obj)
+
+    @classmethod
+    def show_choices(cls) -> List[str]:
+        """Returns the indexes of all registered objects."""
+        return List(cls.index.keys())
+
+    @classmethod
+    def check_choice(cls, key: str, **kwargs) -> bool:
+        """Checks if a choice is valid and returns a bool."""
+        if key not in cls.index.keys():
+            warnings.warn(RegistrationWarning(f"{key} is not a valid choice."))
+            return False
+        return True
+
+    @classmethod
+    def validate_choice(cls, key: str) -> str:
+        """Checks if a choice is valid and stops if not."""
+        if key not in cls.index.keys():
+            raise RegistrationError(f"{key} is not a valid choice.")
+        return key
+
+    @classmethod
+    def reset(cls):
+        """Reset the registry."""
+        cls.index.clear()
 
     @classmethod
     def register_arguments(cls, key: str) -> Callable:
@@ -145,20 +158,27 @@ class RegistryFactory:
         """Return the arguments registered to the key."""
         return cls.arguments[key]
 
-    @classmethod
-    def get_info(cls, key: str) -> Tuple[CreditInfo, CreditType]:
-        """Return the accreditation information for the key."""
-        return cls.accreditation.get(key)
-
+    # Legacy methods
     @classmethod
     def get_choice(cls, key: str) -> object:  # Legacy
         """Legacy: Returns an object from the index."""
         return cls.get(key)
 
+
+class Factory:
+    """A factory class for creating registries."""
+
+    accreditation: Accreditation = Accreditation()
+
     @classmethod
-    def show_choices(cls) -> List[str]:
-        """Returns the indexes of all registered objects."""
-        return List(cls.index.keys())
+    def create_registry(
+        cls, shared: bool = False, post_checks: Optional[List[Type[AbstractPostCheck]]] = None
+    ) -> Type[AbstractRegistry]:
+        class Registry(AbstractRegistry):
+            index = IndexDict(post_checks) if not shared else SharedIndexDict(post_checks)
+            arguments = IndexDict(post_checks) if not shared else SharedIndexDict(post_checks)
+
+        return Registry
 
     @classmethod
     def view_accreditations(cls) -> None:
@@ -167,41 +187,32 @@ class RegistryFactory:
         cls.accreditation.show_accreditations()
 
     @classmethod
-    def check_choice(cls, key: str) -> bool:
-        """Checks if a choice is valid and returns a bool."""
-        if key not in cls.index.keys():
-            warnings.warn(RegistrationWarning(f"{key} is not a valid choice."))
-            return False
-        return True
-
-    @classmethod
-    def validate_choice(cls, key: str) -> None:
-        """Checks if a choice is valid and stops if not."""
-        if key not in cls.index.keys():
-            raise RegistrationError(f"{key} is not a valid choice.")
-
-    @classmethod
-    def get_subclass_arguments(cls, argument_classes: Dict[str, Dict]) -> Dict[str, Any]:
-        """Return the arguments for the subclass."""
-        dataclasses = {}
-
-        RegistryClasses = cls.__subclasses__()
-        registries = {reg.__name__.lower(): reg for reg in RegistryClasses}
-        for name, selection in argument_classes.items():
-            for (registry, call) in selection.items():
-                dataclasses[name] = registries[registry].get_arguments(call)
-
-        return dataclasses
+    def get_info(cls, key: str) -> Tuple[Dict, str]:
+        """Return the accreditation information for the key."""
+        return cls.accreditation.get(key)
 
     @classmethod
     def get_subclass_choices(cls, choices: Dict[str, Dict]) -> Dict[str, Any]:
         """Return the choices for the subclass."""
         objects = {}
 
-        RegistryClasses = cls.__subclasses__()
+        RegistryClasses = AbstractRegistry.__subclasses__()
         registries = {reg.__name__.lower(): reg for reg in RegistryClasses}
         for name, selection in choices.items():
             for (registry, call) in selection.items():
                 objects[name] = registries[registry].get_choice(call)
 
         return objects
+
+    @classmethod
+    def get_subclass_arguments(cls, argument_classes: Dict[str, Dict]) -> Dict[str, Any]:
+        """Return the arguments for the subclass."""
+        dataclasses = {}
+
+        RegistryClasses = AbstractRegistry.__subclasses__()
+        registries = {reg.__name__.lower(): reg for reg in RegistryClasses}
+        for name, selection in argument_classes.items():
+            for (registry, call) in selection.items():
+                dataclasses[name] = registries[registry].get_arguments(call)
+
+        return dataclasses
