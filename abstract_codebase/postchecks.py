@@ -3,7 +3,9 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from enum import Enum, auto
-from typing import Any, Dict, Optional
+from typing import Any, Optional
+
+from abstract_codebase.accreditation import Accreditation
 
 
 __all__ = ["CreditType", "CreditInfo"]
@@ -11,34 +13,40 @@ __all__ = ["CreditType", "CreditInfo"]
 
 class AbstractPostCheck(ABC):
     @abstractmethod
-    def validate_call(self, key, **kwargs) -> bool:
+    def validate_call(self, key: str, **kwargs) -> None:
         """Validate the call."""
         raise NotImplementedError
 
     @abstractmethod
-    def validate_register(self, object, key, **kwargs) -> bool:
+    def validate_register(self, object: Any, key: str, **kwargs) -> None:
         """Validate a new function registered."""
         raise NotImplementedError
 
 
-# cls.checks.called(key)
+class AccreditationPostCheck(AbstractPostCheck):
+    """Postchecks for accreditation."""
 
-# if credit is not None:
-#     cls.accreditation.add_credit(key, credit, credit_type)
+    # accreditation: Accreditation = Accreditation()
 
+    def __init__(self, forced: bool = False) -> None:
+        self.forced = forced
+        self.accreditation = Accreditation()
 
-class partial(dict):
-    @classmethod
-    def credit_postcheck(cls, credit: Dict) -> Any:
-        return CreditInfo(credit)
+    def validate_call(self, key: str, **kwargs) -> None:
+        """Validate the call."""
+        self.accreditation.called(key)
 
-    @classmethod
-    def credit_type_postcheck(cls) -> Any:
-        return CreditType
+    def validate_register(self, object: Any, key: str, **kwargs) -> None:
+        """Validate a new function registered."""
+        print(kwargs)
+        print("credit" in kwargs.keys())
+        print("credit_type" in kwargs.keys())
 
-    @classmethod
-    def version_postcheck(cls) -> Any:
-        return str
+        if "credit" in kwargs.keys() and "credit_type" in kwargs.keys():
+            self.accreditation.add_credit(key, kwargs["credit"], kwargs["credit_type"])
+        else:
+            if self.forced:
+                raise ValueError("Credit and credit type must be specified.")
 
 
 class CreditType(Enum):

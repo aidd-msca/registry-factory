@@ -52,8 +52,8 @@ class RegistrationWarning(Warning):
 class AbstractRegistry(ABC):
     """Abstract class to generate a registry."""
 
-    index: Dict[str, Callable]
-    arguments: Dict[str, Dataclass]
+    index: IndexDict
+    arguments: IndexDict
 
     accreditation: Accreditation = Accreditation()
 
@@ -96,11 +96,11 @@ class AbstractRegistry(ABC):
     def get(cls, key: str, default: Optional[object] = None, **kwargs) -> object:
         """Return the object registered to the key."""
         if default is None:
-            cls.validate_choice(key, **kwargs)
-            return cls.index[key]
+            cls.validate_choice(key)
+            return cls.index.get(key, **kwargs)
         else:
-            cls.check_choice(key, **kwargs)
-            return cls.index.get(key, default)
+            cls.check_choice(key)
+            return cls.index.get(key, default, **kwargs)
 
     @classmethod
     def register(cls, key: str, **kwargs) -> Callable:
@@ -108,7 +108,7 @@ class AbstractRegistry(ABC):
 
         def wrapper(obj: Callable) -> Callable:
             """Register the object to the key."""
-            cls.index[key] = obj  # **kwargs)
+            cls.index.__setitem__(key, obj, **kwargs)
             return obj
 
         return wrapper
@@ -121,7 +121,7 @@ class AbstractRegistry(ABC):
     @classmethod
     def show_choices(cls) -> List[str]:
         """Returns the indexes of all registered objects."""
-        return List(cls.index.keys())
+        return list(cls.index.keys())
 
     @classmethod
     def check_choice(cls, key: str, **kwargs) -> bool:
@@ -172,7 +172,9 @@ class Factory:
 
     @classmethod
     def create_registry(
-        cls, shared: bool = False, post_checks: Optional[List[Type[AbstractPostCheck]]] = None
+        cls,
+        shared: bool = False,
+        post_checks: Optional[List[AbstractPostCheck]] = None,
     ) -> Type[AbstractRegistry]:
         class Registry(AbstractRegistry):
             index = IndexDict(post_checks) if not shared else SharedIndexDict(post_checks)
