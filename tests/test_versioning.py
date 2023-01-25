@@ -1,4 +1,4 @@
-"""Test cases for Registry sharing.
+"""Test cases for Registry meta information through versioning (other meta modules: accreditation).
 Author: PeterHartog
 """
 from dataclasses import dataclass

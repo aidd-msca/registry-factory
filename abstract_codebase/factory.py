@@ -1,4 +1,4 @@
-"""Registraty factory module for a codebase."""
+"""Registry factory module for a codebase."""
 from typing import Any, Dict, List, Optional, Type
 
 from abstract_codebase.index import IndexDict
@@ -19,8 +19,8 @@ class Factory:
     ) -> Type[AbstractRegistry]:
         class Registry(AbstractRegistry):
             facade = ObserverFacade(checks)
-            index = IndexDict(shared=shared)  # SharedIndexDict() if shared else IndexDict()
-            arguments = IndexDict(shared=shared)  # SharedIndexDict() if shared else IndexDict()
+            index = IndexDict(shared=shared)
+            arguments = IndexDict(shared=shared)
 
         return Registry
 
