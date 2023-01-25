@@ -1,7 +1,7 @@
 """Call tracker."""
 
 from typing import Dict, Set
-from abstract_codebase.metacoding import Singleton
+from abstract_codebase.patterns.metacoding import Singleton
 
 __all__ = ["Tracker"]
 

@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 import inspect
 from typing import Any, Dict
 import warnings
-from abstract_codebase.metacoding import UniqueDict
+from abstract_codebase.patterns.metacoding import UniqueDict
 from dataclasses import fields, is_dataclass, asdict
 
 
