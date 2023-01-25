@@ -1,26 +1,14 @@
-"""Registration factory module for a codebase."""
+"""Registry module for a codebase."""
 from abc import ABC
 import warnings
-from typing import Any, Callable, Dict, List, Optional, Tuple, Type
+from typing import Any, Callable, List, Optional, Dict
 
-from abstract_codebase.accreditation import Accreditation
-from abstract_codebase.index import IndexDict, SharedIndexDict
-from abstract_codebase.postchecks import AbstractPostCheck
+from abstract_codebase.patterns.facade import ObserverFacade
+from abstract_codebase.index import IndexDict
+from abstract_codebase.tracker import Tracker
 from abstract_codebase.typescripts import Dataclass
 
-
-# TODO
-# Add test cases for reset method
-# add accreditation with custom credit type
-# add forced accreditation
-# add versioning
-# add versioning with custom version type
-# add forced versioning
-# add factory pattern
-# add factory pattern with custom factory type
-# add forced factory pattern
-# add forced arguments
-# add automatic init arguments
+__all__ = ["RegistrationError", "RegistrationWarning", "AbstractRegistry"]
 
 
 class RegistrationError(Exception):
@@ -55,17 +43,17 @@ class AbstractRegistry(ABC):
     index: IndexDict
     arguments: IndexDict
 
-    accreditation: Accreditation = Accreditation()
+    facade: ObserverFacade
 
     @classmethod
-    def __call__(cls, key: str) -> object:
+    def __call__(cls, key: str) -> None:
         """Return the object registered to the key."""
-        return cls.index[key]
+        raise NotImplementedError("Use the get method to call the registry.")
 
     @classmethod
-    def __getitem__(cls, key: str) -> object:
+    def __getitem__(cls, key: str) -> None:
         """Return the object registered to the key."""
-        return cls.index[key]
+        raise NotImplementedError("Use the get method to call the registry.")
 
     @classmethod
     def __contains__(cls, key: str) -> bool:
@@ -96,11 +84,23 @@ class AbstractRegistry(ABC):
     def get(cls, key: str, default: Optional[object] = None, **kwargs) -> object:
         """Return the object registered to the key."""
         if default is None:
-            cls.validate_choice(key)
-            return cls.index.get(key, **kwargs)
+            cls.validate_choice(key, **kwargs)
+            Tracker().add(key, cls.__name__)
+            return cls.index.get(key)  # , **kwargs)
         else:
-            cls.check_choice(key)
-            return cls.index.get(key, default, **kwargs)
+            cls.check_choice(key, **kwargs)
+            Tracker().add(key, cls.__name__)
+            return cls.index.get(key, default)  # , **kwargs)
+
+    @classmethod
+    def get_info(cls, key: str) -> Dict:
+        """Return the meta information for the key."""
+        return cls.facade.get_info(key)
+
+    @classmethod
+    def print_info(cls, key: str) -> None:
+        """Return the meta information for the key."""
+        cls.facade.print_info(key)
 
     @classmethod
     def register(cls, key: str, **kwargs) -> Callable:
@@ -108,7 +108,9 @@ class AbstractRegistry(ABC):
 
         def wrapper(obj: Callable) -> Callable:
             """Register the object to the key."""
-            cls.index.__setitem__(key, obj, **kwargs)
+            if cls.facade is not None:
+                cls.facade.register_event(key, obj, **kwargs)
+            cls.index[key] = obj
             return obj
 
         return wrapper
@@ -129,13 +131,17 @@ class AbstractRegistry(ABC):
         if key not in cls.index.keys():
             warnings.warn(RegistrationWarning(f"{key} is not a valid choice."))
             return False
+        elif cls.facade is not None:
+            cls.facade.call_event(key, **kwargs)
         return True
 
     @classmethod
-    def validate_choice(cls, key: str) -> str:
+    def validate_choice(cls, key: str, **kwargs) -> str:
         """Checks if a choice is valid and stops if not."""
         if key not in cls.index.keys():
             raise RegistrationError(f"{key} is not a valid choice.")
+        elif cls.facade is not None:
+            cls.facade.call_event(key, **kwargs)
         return key
 
     @classmethod
@@ -163,58 +169,3 @@ class AbstractRegistry(ABC):
     def get_choice(cls, key: str) -> object:  # Legacy
         """Legacy: Returns an object from the index."""
         return cls.get(key)
-
-
-class Factory:
-    """A factory class for creating registries."""
-
-    accreditation: Accreditation = Accreditation()
-
-    @classmethod
-    def create_registry(
-        cls,
-        shared: bool = False,
-        post_checks: Optional[List[AbstractPostCheck]] = None,
-    ) -> Type[AbstractRegistry]:
-        class Registry(AbstractRegistry):
-            index = IndexDict(post_checks) if not shared else SharedIndexDict(post_checks)
-            arguments = IndexDict(post_checks) if not shared else SharedIndexDict(post_checks)
-
-        return Registry
-
-    @classmethod
-    def view_accreditations(cls) -> None:
-        """View the accreditation information."""
-        print("accreditations:")
-        cls.accreditation.show_accreditations()
-
-    @classmethod
-    def get_info(cls, key: str) -> Tuple[Dict, str]:
-        """Return the accreditation information for the key."""
-        return cls.accreditation.get(key)
-
-    @classmethod
-    def get_subclass_choices(cls, choices: Dict[str, Dict]) -> Dict[str, Any]:
-        """Return the choices for the subclass."""
-        objects = {}
-
-        RegistryClasses = AbstractRegistry.__subclasses__()
-        registries = {reg.__name__.lower(): reg for reg in RegistryClasses}
-        for name, selection in choices.items():
-            for (registry, call) in selection.items():
-                objects[name] = registries[registry].get_choice(call)
-
-        return objects
-
-    @classmethod
-    def get_subclass_arguments(cls, argument_classes: Dict[str, Dict]) -> Dict[str, Any]:
-        """Return the arguments for the subclass."""
-        dataclasses = {}
-
-        RegistryClasses = AbstractRegistry.__subclasses__()
-        registries = {reg.__name__.lower(): reg for reg in RegistryClasses}
-        for name, selection in argument_classes.items():
-            for (registry, call) in selection.items():
-                dataclasses[name] = registries[registry].get_arguments(call)
-
-        return dataclasses

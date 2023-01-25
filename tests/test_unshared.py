@@ -3,7 +3,8 @@ Author: PeterHartog
 """
 
 import pytest
-from abstract_codebase.registration import RegistrationError, Factory
+from abstract_codebase.registration import RegistrationError
+from abstract_codebase.factory import Factory
 
 
 class TestUnsharedRegistry:

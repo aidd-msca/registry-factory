@@ -1,90 +1,24 @@
-"""Index variants for registries."""
+from typing import Optional
+import warnings
+from abstract_codebase.metacoding import UniqueDict
 
 
-# TODO
-# Add test cases for reset method
-
-# add sharing using @property
-# add accreditation with custom credit type
-# add forced accreditation
-# add versioning
-# add versioning with custom version type
-# add forced versioning
-# add factory pattern
-# add factory pattern with custom factory type
-# add forced factory pattern
-# add forced arguments
-
-# add automatic init arguments
-# import inspect
-# >>> inspect.signature(Super.__init__)
-
-# Factory pattern type hint
-
-
-# raise warning when there are unused kwargs
-
-from typing import List, Optional
-
-from abstract_codebase.postchecks import AbstractPostCheck
-
-
-class IndexDict(dict):
+class IndexDict(UniqueDict):
     """Dict that raises when reassigning an existing key."""
 
-    post_checks: Optional[List[AbstractPostCheck]]
-
-    def __init__(self, post_checks: Optional[List[AbstractPostCheck]] = None) -> None:
-        super().__init__()
-        self.post_checks = post_checks
-
-    def __setitem__(self, key, value, **kwargs):
-        if self.__contains__(key):
-            raise KeyError("Key already in dict.")
-        else:
-            if self.post_checks is not None:
-                self.register_postcheck(value, key, **kwargs)
-            super().__setitem__(key, value)
-
-    def __getitem__(self, key, **kwargs):
-        if self.__contains__(key):
-            if self.post_checks is not None:
-                self.call_postcheck(key, **kwargs)
-            return super().__getitem__(key)
-        else:
-            raise KeyError("Key not in dict.")
-
-    def get(self, key, default=None, **kwargs):
-        if self.__contains__(key):
-            if self.post_checks is not None:
-                self.call_postcheck(key, **kwargs)
-            return super().get(key, default)
-        else:
-            return default
-
-    def call_postcheck(self, key, **kwargs) -> None:
-        if self.post_checks is not None:
-            for postcheck in self.post_checks:
-                postcheck.validate_call(key, **kwargs)
-
-    def register_postcheck(self, object, key, **kwargs) -> None:
-        if self.post_checks is not None:
-            for postcheck in self.post_checks:
-                postcheck.validate_register(object, key, **kwargs)
-
-
-class SharedIndexDict(IndexDict):
-    """Dict that raises when reassigning an existing key.
-    Only allows one instance to exist, new instances get overridden."""
-
     _instance = None
-    post_checks: Optional[List[AbstractPostCheck]]
 
     def __new__(cls, *args, **kwargs):
-        if cls._instance is None:
-            cls._instance = super().__new__(cls, *args, **kwargs)
-        return cls._instance
+        if "shared" in kwargs:
+            if kwargs["shared"] is True:
+                if cls._instance is None:
+                    cls._instance = super().__new__(cls, *args, **kwargs)
+                elif "warnings" in kwargs:
+                    if kwargs["warnings"] is True:
+                        warnings.warn("SharedIndexDict already exists, overriding with new instance.")
+                return cls._instance
 
-    # def __init__(self, post_checks: Optional[List[AbstractPostCheck]] = None) -> None:
-    #     self._instance = super().__init__(post_checks)
-    #     self.post_checks = post_checks
+        return super().__new__(cls, *args, **kwargs)
+
+    def __init__(self, shared: Optional[bool] = None, warnings: Optional[bool] = None) -> None:
+        super().__init__()
