@@ -1,7 +1,7 @@
 """Facade dealing with calling and registering postchecks for a registry."""
 
 from typing import Any, Dict, List, Optional
-from abstract_codebase.patterns.observer import RegistryObserver
+from registry_factory.patterns.observer import RegistryObserver
 
 __all__ = ["ObserverFacade"]
 

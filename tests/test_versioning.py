@@ -3,8 +3,8 @@ Author: PeterHartog
 """
 from dataclasses import dataclass
 import pytest
-from abstract_codebase.checks.versioning import Versioning
-from abstract_codebase.factory import Factory
+from registry_factory.checks.versioning import Versioning
+from registry_factory.factory import Factory
 
 
 class TestVersioning:

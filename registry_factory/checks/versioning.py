@@ -1,5 +1,5 @@
 from typing import Any
-from abstract_codebase.patterns.observer import MetaInformationObserver
+from registry_factory.patterns.observer import MetaInformationObserver
 from dataclasses import dataclass
 
 

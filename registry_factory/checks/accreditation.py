@@ -1,7 +1,7 @@
 """Accreditation postchecks for a codebase."""
 
 from typing import Any, Optional
-from abstract_codebase.patterns.observer import MetaInformationObserver
+from registry_factory.patterns.observer import MetaInformationObserver
 from dataclasses import dataclass, fields
 
 __all__ = ["Accreditation", "CreditFields"]

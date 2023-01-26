@@ -2,8 +2,8 @@
 Author: PeterHartog
 """
 import pytest
-from abstract_codebase.registration import RegistrationError, RegistrationWarning
-from abstract_codebase.factory import Factory
+from registry_factory.registration import RegistrationError, RegistrationWarning
+from registry_factory.factory import Factory
 
 
 class TestSharedRegistry:

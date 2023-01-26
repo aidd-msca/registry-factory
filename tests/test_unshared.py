@@ -3,8 +3,8 @@ Author: PeterHartog
 """
 
 import pytest
-from abstract_codebase.registration import RegistrationError
-from abstract_codebase.factory import Factory
+from registry_factory.registration import RegistrationError
+from registry_factory.factory import Factory
 
 
 class TestUnsharedRegistry:

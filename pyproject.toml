@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "abstract-codebase"
+name = "registry-factory"
 version = "0.1.0"
 description = "Abstract codebase with utilities to register generic modules."
 authors = ["Peter Hartog <peter.hartog@hotmail.nl>", "Emma Svensson <svensson@ml.jku.at>"]

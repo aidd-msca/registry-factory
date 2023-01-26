@@ -3,7 +3,7 @@ from types import FunctionType
 
 import warnings
 
-from abstract_codebase.patterns.observer import RegistryObserver
+from registry_factory.patterns.observer import RegistryObserver
 
 
 class FactoryPattern(RegistryObserver):

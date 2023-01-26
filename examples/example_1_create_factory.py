@@ -1,4 +1,4 @@
-from abstract_codebase.factory import Factory
+from registry_factory.factory import Factory
 
 
 class CustomFactory(Factory):

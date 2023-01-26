@@ -1,11 +1,11 @@
 """Registry factory module for a codebase."""
 from typing import Any, Dict, List, Optional, Type
 
-from abstract_codebase.index import IndexDict
-from abstract_codebase.patterns.facade import ObserverFacade
-from abstract_codebase.patterns.observer import RegistryObserver
-from abstract_codebase.registration import AbstractRegistry
-from abstract_codebase.tracker import Tracker
+from registry_factory.index import IndexDict
+from registry_factory.patterns.facade import ObserverFacade
+from registry_factory.patterns.observer import RegistryObserver
+from registry_factory.registration import AbstractRegistry
+from registry_factory.tracker import Tracker
 
 
 class Factory:

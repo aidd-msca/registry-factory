@@ -2,8 +2,8 @@
 Author: PeterHartog
 """
 import pytest
-from abstract_codebase.checks.testing import Testing
-from abstract_codebase.factory import Factory
+from registry_factory.checks.testing import Testing
+from registry_factory.factory import Factory
 
 
 class CallableTestModule:

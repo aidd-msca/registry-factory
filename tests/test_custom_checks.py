@@ -4,8 +4,8 @@ Author: PeterHartog
 from typing import Any
 import pytest
 
-from abstract_codebase.patterns.observer import RegistryObserver
-from abstract_codebase.factory import Factory
+from registry_factory.patterns.observer import RegistryObserver
+from registry_factory.factory import Factory
 
 
 class TestObservers:

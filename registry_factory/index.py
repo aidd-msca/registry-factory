@@ -1,6 +1,6 @@
 from typing import Optional
 import warnings
-from abstract_codebase.patterns.metacoding import UniqueDict
+from registry_factory.patterns.metacoding import UniqueDict
 
 
 class IndexDict(UniqueDict):

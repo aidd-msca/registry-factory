@@ -3,10 +3,10 @@ from abc import ABC
 import warnings
 from typing import Any, Callable, List, Optional, Dict
 
-from abstract_codebase.patterns.facade import ObserverFacade
-from abstract_codebase.index import IndexDict
-from abstract_codebase.tracker import Tracker
-from abstract_codebase.typescripts import Dataclass
+from registry_factory.patterns.facade import ObserverFacade
+from registry_factory.index import IndexDict
+from registry_factory.tracker import Tracker
+from registry_factory.typescripts import Dataclass
 
 __all__ = ["RegistrationError", "RegistrationWarning", "AbstractRegistry"]
 

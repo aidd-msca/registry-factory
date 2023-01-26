@@ -2,8 +2,8 @@
 Author: PeterHartog
 """
 import pytest
-from abstract_codebase.checks.factory_pattern import FactoryPattern
-from abstract_codebase.factory import Factory
+from registry_factory.checks.factory_pattern import FactoryPattern
+from registry_factory.factory import Factory
 
 
 class Pattern:
