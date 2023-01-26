@@ -5,8 +5,8 @@ description = "Abstract codebase with utilities to register generic modules."
 authors = ["Peter Hartog <peter.hartog@hotmail.nl>", "Emma Svensson <svensson@ml.jku.at>"]
 license = "MIT"
 readme = "README.md"
-homepage = "https://github.com/aidd-msca/abstract-codebase"
-repository = "https://github.com/aidd-msca/abstract-codebase"
+homepage = "https://github.com/aidd-msca/registry-factory"
+repository = "https://github.com/aidd-msca/registry-factory"
 keywords = ["codebase", "module registry", "accreditation system"]
 classifiers = [
     "Development Status :: 2 - Pre-Alpha",
@@ -16,7 +16,7 @@ classifiers = [
 include = [
     "LICENSE",
 ]
-packages = [{include = "abstract_codebase"}]
+packages = [{include = "registry-factory"}]
 
 [tool.poetry.dependencies]
 python = "^3.8"
