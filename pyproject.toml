@@ -16,7 +16,7 @@ classifiers = [
 include = [
     "LICENSE",
 ]
-packages = [{include = "registry-factory"}]
+packages = [{include = "registry_factory"}]
 
 [tool.poetry.dependencies]
 python = "^3.8"
