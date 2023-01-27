@@ -3,6 +3,8 @@
 ![PyPI](https://img.shields.io/pypi/v/registry-factory)
 ![PyPI](https://img.shields.io/pypi/pyversions/registry-factory)
 ![PyPI](https://img.shields.io/github/license/aidd-msca/registry-factory)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1jlyEd1yxhvFCN82YqEFI82q2n0k_y06F?usp=sharing)
+
 
 An abstract implementation of the software design pattern called registry proposed in (Hartog et. al., 2023), 
 providing a factory for creating registries to which categorically similar modules can be organized.
@@ -20,9 +22,9 @@ functionalities dynamically and achieve a unified, reusable, and interchangeable
 It extends the Factory design pattern without the explicit class dependency. 
 Additionally, the registry supports optional meta information such as versioning, accreditation, 
 testing, etc. 
-The two UML diagrams illustrate the differences between the factory and registry design patterns. 
+The UML diagrams show the differences between the factory and registry patterns. 
 ![plot](figures/registry_uml.png)
-_Figure created with BioRender.com._
+_Created with BioRender.com._
 
 ## Installation
 
@@ -43,7 +45,7 @@ separated from the rest. 2) Modularize the section to be independent of the rest
 Create a registry from the RegistryFactory. 4) Register any modules that provide similar 
 functionalities. 5) Call the optional module from the registry from the main workflow. See below. 
 ![plot](figures/registry_creation.png)
-_Figure created with BioRender.com._
+_Created with BioRender.com._
 
 Further available options and use-cases are described in the following sections.  
 
