@@ -7,34 +7,9 @@ from registry_factory.patterns.facade import ObserverFacade
 from registry_factory.index import IndexDict
 from registry_factory.tracker import Tracker
 from registry_factory.typescripts import Dataclass
+from registry_factory.utils import RegistrationError, RegistrationWarning
 
-__all__ = ["RegistrationError", "RegistrationWarning", "AbstractRegistry"]
-
-
-class RegistrationError(Exception):
-    """Registration error."""
-
-    def __init__(self, message: str):
-        """Initialize the RegistrationError."""
-        super().__init__(message)
-        self.message = message
-
-    def __str__(self):
-        """Return the string representation of the RegistrationError."""
-        return f"RegistrationError: {self.message}"
-
-
-class RegistrationWarning(Warning):
-    """Registration warning."""
-
-    def __init__(self, message: str):
-        """Initialize the RegistrationWarning."""
-        super().__init__(message)
-        self.message = message
-
-    def __str__(self):
-        """Return the string representation of the RegistrationWarning."""
-        return f"RegistrationWarning: {self.message}"
+__all__ = ["AbstractRegistry"]
 
 
 class AbstractRegistry(ABC):

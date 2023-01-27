@@ -2,7 +2,8 @@
 Author: PeterHartog
 """
 import pytest
-from registry_factory.registry import AbstractRegistry, RegistrationError, RegistrationWarning
+from registry_factory.registry import AbstractRegistry
+from registry_factory.utils import RegistrationError, RegistrationWarning
 from registry_factory.factory import Factory
 
 
