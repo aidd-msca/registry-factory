@@ -1,6 +1,6 @@
 from typing import Any, Dict, Optional, Tuple
 import warnings
-from registry_factory.patterns.metacoding import UniqueDict
+from registry_factory.patterns.metacoding import Singleton, UniqueDict
 import random
 
 
@@ -25,7 +25,7 @@ class IndexDict(UniqueDict):
         super().__init__()
 
 
-class HashTable:
+class HashTable(Singleton):
     """Hash table."""
 
     slots: Dict[int, Tuple[str, Dict]]

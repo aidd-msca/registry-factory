@@ -4,7 +4,7 @@ from typing import Any, Dict, List, Optional, Type
 from registry_factory.index import IndexDict
 from registry_factory.patterns.facade import ObserverFacade
 from registry_factory.patterns.observer import RegistryObserver
-from registry_factory.registration import AbstractRegistry
+from registry_factory.registry import AbstractRegistry
 from registry_factory.tracker import Tracker
 
 
