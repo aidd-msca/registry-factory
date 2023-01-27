@@ -23,8 +23,12 @@ It extends the Factory design pattern without the explicit class dependency.
 Additionally, the registry supports optional meta information such as versioning, accreditation, 
 testing, etc. 
 The UML diagrams show the differences between the factory and registry patterns. 
-![plot](figures/registry_uml.png)
-_Created with BioRender.com._
+<p align="center">
+  <br>
+  <img alt="UML diagram of the pattern" src="figures/registry_uml.png">
+  <br>
+<i>Created with BioRender.com</i>
+ </p>
 
 ## Installation
 
@@ -44,8 +48,12 @@ The workflow of creating a registry is the following. 1)  Identify a part of the
 separated from the rest. 2) Modularize the section to be independent of the rest of the code. 3) 
 Create a registry from the RegistryFactory. 4) Register any modules that provide similar 
 functionalities. 5) Call the optional module from the registry from the main workflow. See below. 
-![plot](figures/registry_creation.png)
-_Created with BioRender.com._
+<p align="center">
+  <br>
+  <img alt="Workflow" src="figures/registry_creation.png" width="750">
+  <br>
+<i>Created with BioRender.com</i>
+ </p>
 
 Further available options and use-cases are described in the following sections.  
 
@@ -165,6 +173,7 @@ The work behind this package has received funding from the European Union’s Ho
 research and innovation programme under the Marie Skłodowska-Curie 
 Actions, grant agreement “Advanced machine learning for Innovative Drug 
 Discovery (AIDD)” No 956832”. [Homepage](https://ai-dd.eu/). 
+
 ![plot](figures/aidd.png)
 
 ## Code of Conduct
