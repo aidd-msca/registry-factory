@@ -11,10 +11,6 @@ from registry_factory.factory import Factory
 class TestObservers:
     """Test cases for shared Registry class."""
 
-    class Test(Factory):
-        TestRegistry = Factory.create_registry(shared=True, checks=[])
-        ForcedCreditRegistry = Factory.create_registry(shared=True, checks=[])
-
     class PassiveObserver(RegistryObserver):
         def register_event(self, key: str, object: Any, **kwargs):
             pass
@@ -49,27 +45,27 @@ class TestObservers:
     def test_registry_validate_register(self):
         """Test the registry with the validate register method."""
 
-        class TestFactory(Factory):
+        class _TestFactory(Factory):
             TestRegistry = Factory.create_registry(shared=False, checks=[self.RaiseRegisterError()])
 
         with pytest.raises(Exception):
 
-            @TestFactory.TestRegistry.register("registered")
+            @_TestFactory.TestRegistry.register("registered")
             def test():
                 pass
 
     def test_registry_validate_call(self):
         """Test the registry with the validate call method."""
 
-        class TestFactory(Factory):
+        class _TestFactory(Factory):
             TestRegistry = Factory.create_registry(shared=False, checks=[self.RaiseCallError()])
 
-        @TestFactory.TestRegistry.register("registered")
+        @_TestFactory.TestRegistry.register("registered")
         def test():
             pass
 
         with pytest.raises(Exception):
-            TestFactory.TestRegistry.get("registered")  # == test
+            _TestFactory.TestRegistry.get("registered")  # == test
 
     def test_registry_additional_params(self):
         """Test the registry with the postcheck and additional parameters."""
@@ -86,22 +82,22 @@ class TestObservers:
             def print_info(self, key: str) -> str:
                 pass
 
-        class TestFactory(Factory):
+        class _TestFactory(Factory):
             TestRegistry = Factory.create_registry(shared=False, checks=[AdditionalError()])
 
         with pytest.raises(Exception):
 
-            @TestFactory.TestRegistry.register("additional_params", test="")
+            @_TestFactory.TestRegistry.register("additional_params", test="")
             def test():
                 pass
 
         with pytest.raises(Exception):
 
-            @TestFactory.TestRegistry.register("additional_params")
+            @_TestFactory.TestRegistry.register("additional_params")
             def test2():
                 pass
 
-            TestFactory.TestRegistry.get("additional_params", test="") == test
+            _TestFactory.TestRegistry.get("additional_params", test="") == test
 
     def test_Shared_registry_additional_params(self):
         """Test the registry with the postcheck and additional parameters."""
@@ -118,19 +114,19 @@ class TestObservers:
             def print_info(self, key: str) -> str:
                 pass
 
-        class TestFactory(Factory):
+        class _TestFactory(Factory):
             TestRegistry = Factory.create_registry(shared=True, checks=[AdditionalError()])
 
         with pytest.raises(Exception):
 
-            @TestFactory.TestRegistry.register("additional_params", test="")
+            @_TestFactory.TestRegistry.register("additional_params", test="")
             def test():
                 pass
 
         with pytest.raises(Exception):
 
-            @TestFactory.TestRegistry.register("additional_params")
+            @_TestFactory.TestRegistry.register("additional_params")
             def test2():
                 pass
 
-            TestFactory.TestRegistry.get("additional_params", test="") == test
+            _TestFactory.TestRegistry.get("additional_params", test="") == test

@@ -11,6 +11,9 @@ from registry_factory.tracker import Tracker
 class Factory:
     """A factory class for creating registries."""
 
+    def __init__(self):
+        raise ValueError("Factory is not meant to be instantiated.")
+
     @classmethod
     def create_registry(
         cls,

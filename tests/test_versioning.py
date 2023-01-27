@@ -10,7 +10,7 @@ from registry_factory.factory import Factory
 class TestVersioning:
     """Test cases for versioning."""
 
-    class TestFactory(Factory):
+    class _TestFactory(Factory):
         TestRegistry = Factory.create_registry(shared=False, checks=[Versioning(forced=False)])
         TestSharedRegistry = Factory.create_registry(shared=True, checks=[Versioning(forced=False)])
         ForcedRegistry = Factory.create_registry(shared=False, checks=[Versioning(forced=True)])
@@ -19,7 +19,7 @@ class TestVersioning:
     def test_versioning(self):
         """Test the versioning."""
 
-        @self.TestFactory.ForcedRegistry.register("test1", version="0.0.1", date="2020-01-01")
+        @self._TestFactory.ForcedRegistry.register("test1", version="0.0.1", date="2020-01-01")
         def test1():
             pass
 
@@ -28,14 +28,14 @@ class TestVersioning:
 
         with pytest.raises(Exception):
 
-            @self.TestFactory.ForcedRegistry.register("test2")
+            @self._TestFactory.ForcedRegistry.register("test2")
             def test2():
                 pass
 
     def test_shared(self):
         """Test the shared versioning."""
 
-        @self.TestFactory.ForcedSharedRegistry.register("test3", version="0.0.1", date="2020-01-01")
+        @self._TestFactory.ForcedSharedRegistry.register("test3", version="0.0.1", date="2020-01-01")
         def test3():
             pass
 
@@ -44,66 +44,66 @@ class TestVersioning:
 
         with pytest.raises(Exception):
 
-            @self.TestFactory.ForcedSharedRegistry.register("test4")
+            @self._TestFactory.ForcedSharedRegistry.register("test4")
             def test4():
                 pass
 
     def test_get_versioning(self):
         """Test the get versioning."""
 
-        @self.TestFactory.ForcedSharedRegistry.register("test5", version="0.0.1", date="2020-01-01")
+        @self._TestFactory.ForcedSharedRegistry.register("test5", version="0.0.1", date="2020-01-01")
         def test5():
             pass
 
-        self.TestFactory.ForcedSharedRegistry.get("test5", version="0.0.1", date="2020-01-01")
+        self._TestFactory.ForcedSharedRegistry.get("test5", version="0.0.1", date="2020-01-01")
 
     def test_get_wrong_versioning(self):
         """Test the get wrong versioning."""
 
-        @self.TestFactory.ForcedSharedRegistry.register("test6", version="0.0.1", date="2020-01-01")
+        @self._TestFactory.ForcedSharedRegistry.register("test6", version="0.0.1", date="2020-01-01")
         def test6():
             pass
 
         with pytest.raises(Exception):
-            self.TestFactory.ForcedSharedRegistry.get("test6", version="0.0.2", date="2020-01-01")
+            self._TestFactory.ForcedSharedRegistry.get("test6", version="0.0.2", date="2020-01-01")
 
     def test_get_no_versioning(self):
         """Test the get no versioning."""
 
-        @self.TestFactory.ForcedSharedRegistry.register("test7", version="0.0.1", date="2020-01-01")
+        @self._TestFactory.ForcedSharedRegistry.register("test7", version="0.0.1", date="2020-01-01")
         def test7():
             pass
 
         with pytest.raises(Exception):
-            self.TestFactory.ForcedSharedRegistry.get("test7")
+            self._TestFactory.ForcedSharedRegistry.get("test7")
 
     def test_get_incomplete_versioning(self):
         """Test the get incomplete versioning."""
 
-        @self.TestFactory.ForcedSharedRegistry.register("test8", version="0.0.1", date="2020-01-01")
+        @self._TestFactory.ForcedSharedRegistry.register("test8", version="0.0.1", date="2020-01-01")
         def test8():
             pass
 
         with pytest.raises(Exception):
-            self.TestFactory.ForcedSharedRegistry.get("test8", version="0.0.1")
+            self._TestFactory.ForcedSharedRegistry.get("test8", version="0.0.1")
 
     def test_get_version(self):
         """Test the get incomplete versioning."""
 
-        @self.TestFactory.ForcedSharedRegistry.register("test9", version="0.0.1", date="2020-01-01")
+        @self._TestFactory.ForcedSharedRegistry.register("test9", version="0.0.1", date="2020-01-01")
         def test9():
             pass
 
-        assert self.TestFactory.ForcedSharedRegistry.get_info("test9")["Versioning"]["version"] == "0.0.1"
+        assert self._TestFactory.ForcedSharedRegistry.get_info("test9")["Versioning"]["version"] == "0.0.1"
 
     def test_print_version(self):
         """Test the get incomplete versioning."""
 
-        @self.TestFactory.ForcedSharedRegistry.register("test10", version="0.0.1", date="2020-01-01")
+        @self._TestFactory.ForcedSharedRegistry.register("test10", version="0.0.1", date="2020-01-01")
         def test10():
             pass
 
-        assert self.TestFactory.ForcedSharedRegistry.print_info("test10") is None
+        assert self._TestFactory.ForcedSharedRegistry.print_info("test10") is None
 
     def test_custom_version(self):
         """Test custom versioning."""
