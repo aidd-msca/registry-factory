@@ -11,7 +11,7 @@ class TestIndividualRegistry:
     """Test cases for a newly created Registry class."""
 
     class _TestFactory(Factory):
-        TestRegistry = Factory.create_registry(shared=True)
+        TestRegistry = Factory.create_registry(shared=False)
 
     def test_inheritance(self):
         """Test the inheritance of the Registry class."""
@@ -83,11 +83,22 @@ class TestIndividualRegistry:
             def test3():
                 pass
 
-            self._TestFactory.TestRegistry.register_prebuilt(test3, "double_registered")
+            self._TestFactory.TestRegistry.register_prebuilt(obj=test3, key="double_registered")
 
-        with pytest.raises(KeyError):
+        with pytest.raises(Exception):
 
             def test4():
                 pass
 
-            self._TestFactory.TestRegistry.register_prebuilt(test4, "double_prebuilt")
+            self._TestFactory.TestRegistry.register_prebuilt(obj=test4, key="double_prebuilt")
+
+    def test_reset(self):
+        """Test the reset method."""
+
+        @self._TestFactory.TestRegistry.register("resetting_registered")
+        def test():
+            pass
+
+        self._TestFactory.TestRegistry.reset()
+        with pytest.raises(RegistrationError):
+            self._TestFactory.TestRegistry.get("resetting_registered")

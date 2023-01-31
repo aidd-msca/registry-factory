@@ -1,30 +1,66 @@
 """Registry factory module for a codebase."""
 from typing import Any, Dict, List, Optional, Type
 
-from registry_factory.index import IndexDict
 from registry_factory.patterns.facade import ObserverFacade
+from registry_factory.patterns.mediator import HashMediator
 from registry_factory.patterns.observer import RegistryObserver
 from registry_factory.registry import AbstractRegistry
 from registry_factory.tracker import Tracker
+from registry_factory.index import RegistryTable
 
 
 class Factory:
     """A factory class for creating registries."""
 
+    _hash_map: RegistryTable
+    _shared_hash: int
+    _shared_arguments_hash: int
+
     def __init__(self):
         raise ValueError("Factory is not meant to be instantiated.")
+
+    @classmethod
+    def hash_map(cls) -> RegistryTable:
+        """Return the hash map."""
+        if not hasattr(cls, "_hash_map"):
+            cls.init_hash_map()
+        return cls._hash_map
+
+    @classmethod
+    def shared_hash(cls) -> int:
+        """Return the shared hash."""
+        if not hasattr(cls, "_shared_hash"):
+            cls.init_hash_map()
+        return cls._shared_hash
+
+    @classmethod
+    def shared_arguments_hash(cls) -> int:
+        """Return the shared arguments hash."""
+        if not hasattr(cls, "_shared_arguments_hash"):
+            cls.init_hash_map()
+        return cls._shared_arguments_hash
+
+    @classmethod
+    def init_hash_map(cls, bitsize=256, max_generation=1000) -> None:
+        """Initialize the hash map."""
+        cls._hash_map = RegistryTable(bitsize, max_generation)
+        cls._shared_hash = cls._hash_map.generate_hash()
+        cls._shared_arguments_hash = cls._hash_map.generate_hash()
 
     @classmethod
     def create_registry(
         cls,
         shared: bool = False,
+        skip_validation: bool = False,
         checks: Optional[List[RegistryObserver]] = None,
     ) -> Type[AbstractRegistry]:
-        class Registry(AbstractRegistry):
-            facade = ObserverFacade(checks)
-            index = IndexDict(shared=shared)
-            arguments = IndexDict(shared=shared)
+        registry_hash = cls.shared_hash() if shared else cls.hash_map().generate_hash()
 
+        class Registry(AbstractRegistry):
+            _registry_hash = registry_hash
+            mediator = HashMediator(registry_hash, ObserverFacade(skip_validation, observers=checks))
+
+        cls.hash_map().set(registry_hash)
         return Registry
 
     @classmethod

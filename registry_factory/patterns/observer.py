@@ -1,71 +1,67 @@
 from abc import ABC, abstractmethod
 import inspect
-from typing import Any, Dict
+from typing import Any, Dict, List, Optional, Tuple
 import warnings
-from registry_factory.patterns.metacoding import UniqueDict
-from dataclasses import fields, is_dataclass, asdict
+from dataclasses import is_dataclass
 
 
 class RegistryObserver(ABC):
-    index: Dict[str, Any] = UniqueDict()
-
-    @property
-    def name(self) -> str:
-        return self.__class__.__name__
+    def generate_key_dict(self, key: str, **kwargs) -> Dict:
+        return {}
 
     @abstractmethod
-    def register_event(self, key: str, object: Any, **kwargs):
+    def register_event(self, key: str, obj: Any, **kwargs) -> Tuple[str, Dict, Any, Optional[Dict]]:
         raise NotImplementedError
 
     @abstractmethod
-    def call_event(self, key: str, **kwargs):
+    def call_event(self, key: str, obj: Any, **kwargs) -> Tuple[str, Dict, Any, Optional[Dict]]:
         raise NotImplementedError
-
-    def get_info(self, key: str) -> Any:
-        return self.index[key]
-
-    def info(self, key: str) -> str:
-        pass
 
 
 class MetaInformationObserver(RegistryObserver):
-    def __init__(self, meta_fields: Any, forced: bool = False):
+    def __init__(self, meta_fields: Any, key_parameters: List[str], forced: bool = False):
         self.forced = forced
         if not is_dataclass(meta_fields):
             raise TypeError("Fields must be a dataclass.")
+        self.key_parameters = key_parameters
         self.meta_fields = meta_fields
         self.parameters = [p for p in inspect.signature(self.meta_fields).parameters]
 
-    def register_event(self, key: str, object: Any, **kwargs):
+    def generate_key_dict(self, key: str, **kwargs) -> Dict:
+        return {k: v for k, v in kwargs.items() if k in self.key_parameters}
+
+    def register_event(self, key: str, obj: Any, **kwargs) -> Tuple[str, Dict, Any, Optional[Dict]]:
+        register_dict = {}
         missing_fields = []
         for p in self.parameters:
             if p not in kwargs.keys():
                 missing_fields.append(p)
+            else:
+                register_dict[p] = kwargs[p]
+
+        key_dict = self.generate_key_dict(key=key, **kwargs)
+        meta_dict = {k: v for k, v in register_dict.items() if k not in key_dict}
+
         if missing_fields != [] and self.forced:
             raise ValueError(f"Information must have a {', '.join(missing_fields)} field.")
-        elif missing_fields == []:
-            test = self.meta_fields(
-                **{k: v for k, v in kwargs.items() if k in inspect.signature(self.meta_fields).parameters}
-            )
-            self.index[key] = test
-        else:
-            warnings.warn(f"Information must have a {', '.join(missing_fields)} field.")
+        elif missing_fields != [] and not self.forced:
+            warnings.warn(f"Information should have a {', '.join(missing_fields)} field.")
+        return (key, key_dict, obj, meta_dict)
 
-    def call_event(self, key: str, **kwargs):
-        try:
-            for field in fields(self.index[key]):
-                assert kwargs[field.name] == getattr(self.index[key], field.name)
-        except Exception as e:
-            if self.forced:
-                raise e
+    def call_event(self, key: str, obj: Any, **kwargs) -> Tuple[str, Dict, Any, Optional[Dict]]:
+        call_dict = {}
+        missing_fields = []
+        for p in self.parameters:
+            if p not in kwargs.keys():
+                missing_fields.append(p)
             else:
-                warnings.warn(str(e))
+                call_dict[p] = kwargs[p]
 
-    def get_info(self, key: str) -> Any:
-        return asdict(self.index[key])
+        key_dict = self.generate_key_dict(key=key, **kwargs)
+        meta_dict = {k: v for k, v in call_dict.items() if k not in key_dict}
 
-    def info(self, key: str) -> str:
-        name_values = {
-            ", ".join([f"{field.name}: {getattr(self.index[key], field.name)}" for field in fields(self.index[key])])
-        }
-        return f"{name_values}"
+        if missing_fields != [] and self.forced:
+            raise ValueError(f"Information must have a {', '.join(missing_fields)} field.")
+        elif missing_fields != [] and not self.forced:
+            warnings.warn(f"Information should have a {', '.join(missing_fields)} field.")
+        return (key, key_dict, obj, meta_dict)

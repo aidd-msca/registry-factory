@@ -1,7 +1,9 @@
 from typing import Any, Dict, Optional, Tuple
 import warnings
-from registry_factory.patterns.metacoding import Singleton, UniqueDict
+from registry_factory.patterns.metacoding import UniqueDict
 import random
+
+from registry_factory.typescripts import Dataclass
 
 
 class IndexDict(UniqueDict):
@@ -25,18 +27,19 @@ class IndexDict(UniqueDict):
         super().__init__()
 
 
-class HashTable(Singleton):
-    """Hash table."""
+class AbstractHash:
+    """Abstract class for hash table."""
 
-    slots: Dict[int, Tuple[str, Dict]]
+    slots: Dict[int, Any]
     data: Dict[int, Any]
-    meta_dict: Dict[int, Dict]
 
-    def __init__(self):
-        self.bitsize = 256
-        self.max_generation = 1000
+    def __init__(self, bitsize: int = 256, max_generation: int = 1000):
+        self.bitsize = bitsize
+        self.max_generation = max_generation
+        self.slots = {}
+        self.data = {}
 
-    def generate_hash(self):
+    def generate_hash(self) -> int:
         key_hash = random.getrandbits(self.bitsize)
 
         current_generation = 0
@@ -46,20 +49,48 @@ class HashTable(Singleton):
 
         return key_hash
 
-    def set(self, key: str, key_dict: Dict, value: Any, meta: Optional[Dict] = None) -> None:
+    def __len__(self) -> int:
+        return len(self.slots)
+
+    def __iter__(self):
+        return iter(self.slots.values())
+
+
+class HashTable(AbstractHash):
+    """Hash table."""
+
+    slots: Dict[int, Tuple[str, Dict]]
+    data: Dict[int, Any]
+    arg_dict: Dict[int, Dataclass]
+    meta_dict: Dict[int, Dict]
+
+    def __init__(self, bitsize: int = 256, max_generation: int = 1000):
+        super().__init__(bitsize, max_generation)
+        self.meta_dict = {}
+
+    def set(self, key: str, key_dict: Dict, obj: Any, meta: Optional[Dict] = None) -> None:
         full_key: Tuple[str, Dict] = (key, key_dict)
         if full_key in self.slots.values():
-            raise KeyError(f"{key}, {key_dict} already exist in the registry.")
-
-        hash_value = self.generate_hash()
-        self.slots[hash_value] = full_key
-        self.data[hash_value] = value
+            hash_value = self.get_hash(key, key_dict)
+            if hash_value in self.data.keys():
+                raise KeyError(f"{key}, {key_dict} already exist in the registry.")
+        else:
+            hash_value = self.generate_hash()
+            self.slots[hash_value] = full_key
+        self.data[hash_value] = obj
         if meta is not None:
             self.meta_dict[hash_value] = meta
 
-    def set_meta(self, key: str, key_dict: Dict, meta: Dict) -> None:
-        hash_value = self.get_hash(key, key_dict)
-        self.meta_dict[hash_value] = meta
+    def set_arguments(self, key: str, key_dict: Dict, arguments: Dataclass) -> None:
+        full_key: Tuple[str, Dict] = (key, key_dict)
+        if full_key in self.slots.values() and full_key in self.arg_dict.values():
+            raise KeyError(f"{key}, {key_dict} arguments already exist in the registry.")
+        elif full_key in self.slots.values():
+            hash_value = self.get_hash(key, key_dict)
+        else:
+            hash_value = self.generate_hash()
+            self.slots[hash_value] = full_key
+        self.arg_dict[hash_value] = arguments
 
     def get_hash(self, key: str, key_dict: Dict) -> int:
         for k, v in self.slots.items():
@@ -71,6 +102,10 @@ class HashTable(Singleton):
         hash_value = self.get_hash(key, key_dict)
         return self.data[hash_value]
 
+    def get_arguments(self, key: str, key_dict: Dict) -> Dataclass:
+        hash_value = self.get_hash(key, key_dict)
+        return self.arg_dict[hash_value]
+
     def get_meta(self, key: str, key_dict: Dict) -> Dict:
         hash_value = self.get_hash(key, key_dict)
         return self.meta_dict[hash_value]
@@ -81,11 +116,41 @@ class HashTable(Singleton):
         del self.data[hash_value]
         del self.meta_dict[hash_value]
 
+    def clear(self) -> None:
+        self.slots.clear()
+        self.data.clear()
+        self.meta_dict.clear()
+
     def __contains__(self, key: str, key_dict: Dict) -> bool:
         return (key, key_dict) in self.slots.values()
 
-    def __len__(self) -> int:
-        return len(self.slots)
 
-    def __iter__(self):
-        return iter(self.slots.values())
+class RegistryTable(AbstractHash):
+    slots: Dict[int, Any]
+
+    def set(self, hash: Optional[int] = None) -> None:
+        if hash is None:
+            hash = self.generate_hash()
+        elif hash in self.slots.keys():
+            raise KeyError(f"{hash} already exists.")
+
+        self.slots[hash] = HashTable()
+
+    def get_hash(self, hash: int) -> int:
+        for k, v in self.slots.items():
+            if k == hash:
+                return v
+        raise KeyError(f"{hash} not found.")
+
+    def get(self, hash: int) -> HashTable:
+        hash_value = self.get_hash(hash)
+        return self.data[hash_value]
+
+    def get_meta(self, **kwargs) -> Dict:
+        raise NotImplementedError
+
+    def delete(self, hash: int) -> None:
+        del self.slots[hash]
+
+    def __contains__(self, hash: int) -> bool:
+        return hash in self.slots.keys()
