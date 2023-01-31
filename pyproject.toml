@@ -7,7 +7,7 @@ license = "MIT"
 readme = "README.md"
 homepage = "https://github.com/aidd-msca/registry-factory"
 repository = "https://github.com/aidd-msca/registry-factory"
-keywords = ["codebase", "module registry", "accreditation system"]
+keywords = ["registry", "factory", "codebase", "module registry", "accreditation system"]
 classifiers = [
     "Development Status :: 2 - Pre-Alpha",
     "Environment :: GPU :: NVIDIA CUDA :: 11.4",
