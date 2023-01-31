@@ -1,4 +1,4 @@
-from typing import Any, Callable
+from typing import Any, Callable, Dict, Optional, Tuple
 import warnings
 from registry_factory.patterns.observer import RegistryObserver
 
@@ -11,25 +11,17 @@ class Testing(RegistryObserver):
         self.forced = forced
         self.test_module = test_module
 
-    def register_event(self, key: str, object: Any, **kwargs):
+    def register_event(self, key: str, obj: Any, **kwargs) -> Tuple[str, Dict, Any, Optional[Dict]]:
         try:
-            self.test_module(object)
-            self.index[key] = True
+            self.test_module(key, obj, **kwargs)
+            passed_test = True
         except Exception:
             if self.forced:
                 raise AssertionError("Object must pass the test module.")
             else:
                 warnings.warn("Object must pass the test module.")
-                self.index[key] = False
+                passed_test = False
+        return (key, {}, obj, {"passed_test": passed_test})
 
-    def call_event(self, key: str, **kwargs):
-        pass
-
-    def get_info(self, key: str) -> Any:
-        return self.index[key]
-
-    def info(self, key: str) -> str:
-        if self.index[key] is True:
-            return f"{key} has passed testing."
-        else:
-            return f"{key} has not passed testing."
+    def call_event(self, key: str, obj: Any, **kwargs) -> Tuple[str, Dict, Any, Optional[Dict]]:
+        return (key, {}, obj, None)
