@@ -6,7 +6,7 @@ from registry_factory.patterns.mediator import HashMediator
 from registry_factory.patterns.observer import RegistryObserver
 from registry_factory.registry import AbstractRegistry
 from registry_factory.tracker import Tracker
-from registry_factory.index import RegistryTable
+from registry_factory.index import RegistryTable, HashTable
 
 
 class Factory:
@@ -14,7 +14,7 @@ class Factory:
 
     _hash_map: RegistryTable
     _shared_hash: int
-    _shared_arguments_hash: int
+    _shared_hash_table: HashTable
 
     def __init__(self):
         raise ValueError("Factory is not meant to be instantiated.")
@@ -34,18 +34,17 @@ class Factory:
         return cls._shared_hash
 
     @classmethod
-    def shared_arguments_hash(cls) -> int:
-        """Return the shared arguments hash."""
-        if not hasattr(cls, "_shared_arguments_hash"):
-            cls.init_hash_map()
-        return cls._shared_arguments_hash
+    def shared_hash_table(cls) -> HashTable:
+        """Return the shared hash table."""
+        if not hasattr(cls, "_shared_hash_table"):
+            cls._shared_hash_table = HashTable()
+        return cls._shared_hash_table
 
     @classmethod
     def init_hash_map(cls, bitsize=256, max_generation=1000) -> None:
         """Initialize the hash map."""
         cls._hash_map = RegistryTable(bitsize, max_generation)
         cls._shared_hash = cls._hash_map.generate_hash()
-        cls._shared_arguments_hash = cls._hash_map.generate_hash()
 
     @classmethod
     def create_registry(
@@ -60,7 +59,10 @@ class Factory:
             _registry_hash = registry_hash
             mediator = HashMediator(registry_hash, ObserverFacade(skip_validation, observers=checks))
 
-        cls.hash_map().set(registry_hash)
+        if not shared:
+            cls.hash_map().set(registry_hash)
+        else:
+            Registry.mediator.hash_table = cls.shared_hash_table()
         return Registry
 
     @classmethod

@@ -85,7 +85,7 @@ class TestIndividualRegistry:
 
             self._TestFactory.TestRegistry.register_prebuilt(obj=test3, key="double_registered")
 
-        with pytest.raises(Exception):
+        with pytest.raises(KeyError):
 
             def test4():
                 pass

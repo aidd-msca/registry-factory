@@ -3,11 +3,8 @@ from abc import ABC
 import warnings
 from typing import Any, Callable, List, Optional, Dict, Tuple
 
-# from registry_factory.patterns.facade import ObserverFacade
+# from registry_factory.tracker import Tracker
 from registry_factory.patterns.mediator import HashMediator
-
-# from registry_factory.index import IndexDict
-from registry_factory.tracker import Tracker
 from registry_factory.typescripts import Dataclass
 from registry_factory.utils import RegistrationError, RegistrationWarning
 

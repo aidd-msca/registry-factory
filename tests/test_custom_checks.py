@@ -1,7 +1,7 @@
 """Test cases for Registry sharing.
 Author: PeterHartog
 """
-from typing import Any
+from typing import Any, Dict, Optional, Tuple
 import pytest
 
 from registry_factory.patterns.observer import RegistryObserver
@@ -12,21 +12,18 @@ class TestObservers:
     """Test cases for shared Registry class."""
 
     class PassiveObserver(RegistryObserver):
-        def register_event(self, key: str, object: Any, **kwargs):
-            pass
+        def register_event(self, key: str, obj: Any, **kwargs) -> Tuple[str, Dict, Any, Optional[Dict]]:
+            return (key, {}, obj, None)
 
-        def call_event(self, key: str, **kwargs):
-            pass
-
-        def print_info(self, key: str) -> str:
-            pass
+        def call_event(self, key: str, obj: Any, **kwargs) -> Tuple[str, Dict, Any, Optional[Dict]]:
+            return (key, {}, obj, None)
 
     class RaiseCallError(PassiveObserver):
-        def call_event(self, key: str, **kwargs):
+        def call_event(self, key: str, obj: Any, **kwargs) -> Tuple[str, Dict, Any, Optional[Dict]]:
             raise ValueError
 
     class RaiseRegisterError(PassiveObserver):
-        def register_event(self, key: str, object: Any, **kwargs):
+        def register_event(self, key: str, obj: Any, **kwargs) -> Tuple[str, Dict, Any, Optional[Dict]]:
             raise ValueError
 
     def test_instantiation(self):
@@ -71,16 +68,15 @@ class TestObservers:
         """Test the registry with the postcheck and additional parameters."""
 
         class AdditionalError(RegistryObserver):
-            def call_event(self, key: str, **kwargs):
+            def call_event(self, key: str, obj: Any, **kwargs) -> Tuple[str, Dict, Any, Optional[Dict]]:
                 if "test" in kwargs:
                     raise ValueError
+                return (key, {}, obj, None)
 
-            def register_event(self, key: str, object: Any, **kwargs):
+            def register_event(self, key: str, obj: Any, **kwargs) -> Tuple[str, Dict, Any, Optional[Dict]]:
                 if "test" in kwargs:
                     raise ValueError
-
-            def print_info(self, key: str) -> str:
-                pass
+                return (key, {}, obj, None)
 
         class _TestFactory(Factory):
             TestRegistry = Factory.create_registry(shared=False, checks=[AdditionalError()])
@@ -103,16 +99,15 @@ class TestObservers:
         """Test the registry with the postcheck and additional parameters."""
 
         class AdditionalError(RegistryObserver):
-            def call_event(self, key: str, **kwargs):
+            def call_event(self, key: str, obj: Any, **kwargs) -> Tuple[str, Dict, Any, Optional[Dict]]:
                 if "test" in kwargs:
                     raise ValueError
+                return (key, {}, obj, None)
 
-            def register_event(self, key: str, object: Any, **kwargs):
+            def register_event(self, key: str, obj: Any, **kwargs) -> Tuple[str, Dict, Any, Optional[Dict]]:
                 if "test" in kwargs:
                     raise ValueError
-
-            def print_info(self, key: str) -> str:
-                pass
+                return (key, {}, obj, None)
 
         class _TestFactory(Factory):
             TestRegistry = Factory.create_registry(shared=True, checks=[AdditionalError()])

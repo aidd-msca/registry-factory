@@ -33,3 +33,13 @@ class HashMediator:
     def get_meta(self, key: str, **kwargs) -> Dict:
         key_dict = self.generate_key_dict(key=key, **kwargs)
         return self.hash_table.get_meta(key, key_dict)
+
+
+class HashConnection:
+    connection: Dict[int, HashMediator]
+
+    def add_connection(self, connection_hash: int, mediator: HashMediator) -> None:
+        self.connection[connection_hash] = mediator
+
+    def get_connection(self, connection_hash: int) -> HashMediator:
+        return self.connection[connection_hash]
