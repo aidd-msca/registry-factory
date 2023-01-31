@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, List
 from registry_factory.patterns.observer import MetaInformationObserver
 from dataclasses import dataclass
 
@@ -10,5 +10,5 @@ class VersioningFields:
 
 
 class Versioning(MetaInformationObserver):
-    def __init__(self, version_fields: Any = VersioningFields, forced: bool = False):
-        super().__init__(meta_fields=version_fields, forced=forced)
+    def __init__(self, version_fields: Any = VersioningFields, key_list: List = ["version"], forced: bool = False):
+        super().__init__(meta_fields=version_fields, key_parameters=key_list, forced=forced)

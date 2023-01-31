@@ -32,6 +32,8 @@ class HashMediator:
 
     def get_meta(self, key: str, **kwargs) -> Dict:
         key_dict = self.generate_key_dict(key=key, **kwargs)
+        print("heya")
+        print(key_dict)
         return self.hash_table.get_meta(key, key_dict)
 
 

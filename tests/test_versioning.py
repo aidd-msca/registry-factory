@@ -1,8 +1,8 @@
 """Test cases for Registry meta information through versioning (other meta modules: accreditation).
 Author: PeterHartog
 """
-from dataclasses import dataclass
 import pytest
+from dataclasses import dataclass
 from registry_factory.checks.versioning import Versioning
 from registry_factory.factory import Factory
 
@@ -94,16 +94,7 @@ class TestVersioning:
         def test9():
             pass
 
-        assert self._TestFactory.ForcedSharedRegistry.get_info("test9")["Versioning"]["version"] == "0.0.1"
-
-    def test_print_version(self):
-        """Test the get incomplete versioning."""
-
-        @self._TestFactory.ForcedSharedRegistry.register("test10", version="0.0.1", date="2020-01-01")
-        def test10():
-            pass
-
-        assert self._TestFactory.ForcedSharedRegistry.print_info("test10") is None
+        assert self._TestFactory.ForcedSharedRegistry.get_info("test9", version="0.0.1")["date"] == "2020-01-01"
 
     def test_custom_version(self):
         """Test custom versioning."""
@@ -118,8 +109,8 @@ class TestVersioning:
 
         Registry = Factory.create_registry(shared=True, checks=[Versioning(CustomFields, forced=False)])
 
-        @Registry.register("test11", version="0.0.1", date="2020-01-01", environment="test")
-        def test11():
+        @Registry.register("test10", version="0.0.1", date="2020-01-01", environment="test")
+        def test10():
             pass
 
-        assert Registry.get_info("test11")["Versioning"]["environment"] == "test"
+        assert Registry.get_info("test10", version="0.0.1")["environment"] == "test"
