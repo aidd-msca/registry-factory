@@ -1,8 +1,8 @@
 """Accreditation postchecks for a codebase."""
 
-from typing import Any, Optional
+from typing import Any, List, Optional
 from registry_factory.patterns.observer import MetaInformationObserver
-from dataclasses import dataclass, fields
+from dataclasses import dataclass
 
 __all__ = ["Accreditation", "CreditFields"]
 
@@ -28,10 +28,5 @@ class CreditFields:
 
 
 class Accreditation(MetaInformationObserver):
-    def __init__(self, version_fields: Any = CreditFields, forced: bool = False):
-        super().__init__(meta_fields=version_fields, forced=forced)
-
-    def get(self, key: str) -> Any:
-        """Return the object."""
-        name_values = {", ".join([f"{field.name}: {getattr(self, field.name)}" for field in fields(self.index[key])])}
-        return f"Credit({name_values})"
+    def __init__(self, credit_fields: Any = CreditFields, key_list: List = [], forced: bool = False):
+        super().__init__(meta_fields=credit_fields, key_parameters=key_list, forced=forced)
