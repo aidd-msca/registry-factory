@@ -8,12 +8,10 @@
 An abstract implementation of the software design pattern called registry proposed in (Hartog et. al., 2023),
 providing a factory for creating registries to which categorically similar modules can be organized.
 
-**Content:**
 **[Installation](#installation)**
 | **[Dependencies](#dependencies)**
 | **[Usage](#usage)**
 | **[Citation](#citation)**
-| **[Code of Conduct](#code-of-conduct)**
 
 ### Overview
 
@@ -204,8 +202,3 @@ Actions, grant agreement “Advanced machine learning for Innovative Drug
 Discovery (AIDD)” No 956832”. [Homepage](https://ai-dd.eu/).
 
 ![plot](figures/aidd.png)
-
-## Code of Conduct
-
-Everyone interacting in the codebase, issue trackers, chat rooms, and mailing lists is expected to follow the
-[PyPA Code of Conduct](https://www.pypa.io/en/latest/code-of-conduct/).
