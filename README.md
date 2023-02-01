@@ -1,8 +1,9 @@
 # RegistryFactory
 
 [![PyPI version](https://badge.fury.io/py/registry-factory.svg)](https://badge.fury.io/py/registry-factory)
-![PyPI](https://img.shields.io/github/license/aidd-msca/registry-factory)
+[![PyPI](https://img.shields.io/github/license/aidd-msca/registry-factory)](LICENSE)
 ![PyPI](https://img.shields.io/pypi/pyversions/registry-factory)
+[![GitHub Repo stars](https://img.shields.io/github/stars/aidd-msca/registry-factory)](https://github.com/aidd-msca/registry-factory/stargazers)
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1jlyEd1yxhvFCN82YqEFI82q2n0k_y06F?usp=sharing)
 
 An abstract implementation of the software design pattern called registry proposed in (Hartog et. al., 2023),
