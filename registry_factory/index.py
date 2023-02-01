@@ -66,6 +66,7 @@ class HashTable(AbstractHash):
 
     def __init__(self, bitsize: int = 256, max_generation: int = 1000):
         super().__init__(bitsize, max_generation)
+        self.arg_dict = {}
         self.meta_dict = {}
 
     def set(self, key: str, key_dict: Dict, obj: Any, meta: Optional[Dict] = None) -> None:
