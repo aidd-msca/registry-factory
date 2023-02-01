@@ -170,14 +170,74 @@ We also provide defining tests and post checks applied to all modules in a regis
 or post checks as follows when creating the registry.
 
 ```Python
+class Pattern:
+    """Test pattern."""
+
+    def __init__(self):
+        pass
+
+    def hello_world(self):
+        """Hello world."""
+        print("Hello world")
+
+class Registries(Factory):
+    ModelRegistry = Factory.create_registry(
+        shared=False, checks=[FactoryPattern(factory_pattern=Pattern, forced=False)]
+    )
+
+# No error, the module passes the test.
 @ModelRegistry.register(
-    call_name="simple_model",
-    author="Author name",
-    credit_type=CreditType.REFERENCE,
-    additional_information="Reference published work in (link)."
+    call_name="hello_world"
 )
-class SimpleModel(nn.Module):
-    ...
+class HelloWorld(Pattern):
+    pass
+
+# No error, the module passes the test.
+@ModelRegistry.register(
+    call_name="hello_world2"
+)
+class HelloWorld:
+    def __init__(self):
+        pass
+
+    def hello_world(self):
+        """Hello world."""
+        print("Hello world")
+
+# Error, the module does not pass the test.
+@ModelRegistry.register(
+    call_name="hello_world2"
+)
+class HelloWorld:
+    def __init__(self):
+        pass
+
+    def goodday_world(self):
+        """Good day world."""
+        print("Good day world")
+```
+
+The factory also supports adding a callable test module to the registry. The callable test module can be specified to be called when a module is registered. The callable test module can be used to test the module when it is registered. The callable test module can be specified as follows when creating the registry.
+
+```Python
+class CallableTestModule:
+    """Module to test."""
+
+    def __init__(self, key: str, obj: Any, **kwargs):
+        self.name = obj
+        self.assert_name()
+
+    def assert_name(self):
+        assert self.name == "test", "Name is not test"
+
+
+
+class Registries(Factory):
+    ModelRegistry = Factory.create_registry(
+        shared=False, checks=[Testing(test_module=CallableTestModule, forced=True)]
+    )
+
+Registries.ModelRegistry.register_prebuilt(key="name_test", obj="test") # No error, the module passes the test.
 ```
 
 ## Citation
