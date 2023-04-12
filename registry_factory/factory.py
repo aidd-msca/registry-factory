@@ -1,5 +1,7 @@
 """Registry factory module for a codebase."""
-from typing import Any, Dict, List, Optional, Type
+# from __future__ import annotations
+
+from typing import Any, Dict, List, Optional, Tuple, Type
 
 from registry_factory.patterns.facade import ObserverFacade
 from registry_factory.patterns.mediator import HashMediator
@@ -72,27 +74,76 @@ class Factory:
         Tracker().show()
 
     @classmethod
-    def get_subclass_choices(cls, choices: Dict[str, Dict]) -> Dict[str, Any]:
+    def get_registries(cls) -> Dict[str, AbstractRegistry]:
         """Return the choices for the subclass."""
-        objects = {}
-
-        RegistryClasses = AbstractRegistry.__subclasses__()
-        registries = {reg.__name__.lower(): reg for reg in RegistryClasses}
-        for name, selection in choices.items():
-            for (registry, call) in selection.items():
-                objects[name] = registries[registry].get_choice(call)
-
-        return objects
+        possible_registries = [attr for attr in dir(cls) if not attr.startswith("__")]
+        registries = {
+            reg: getattr(cls, reg)
+            for reg in possible_registries
+            if hasattr(getattr(cls, reg), "_registry_hash")
+            and (
+                getattr(cls, reg)._registry_hash in cls.hash_map()
+                or getattr(cls, reg)._registry_hash == cls.shared_hash()
+            )
+        }
+        return registries
 
     @classmethod
-    def get_subclass_arguments(cls, argument_classes: Dict[str, Dict]) -> Dict[str, Any]:
+    def items(cls) -> List[Tuple[str, Any]]:
+        """Return the items for the subclass."""
+        return [(name, reg) for name, reg in cls.get_registries().items()]
+
+    @classmethod
+    def keys(cls) -> List[str]:
+        """Return the keys for the subclass."""
+        return [name for name, reg in cls.get_registries().items()]
+
+    @classmethod
+    def values(cls) -> List[Any]:
+        """Return the values for the subclass."""
+        return [reg for name, reg in cls.get_registries().items()]
+
+    @classmethod
+    def get_options(cls, registries_names: Optional[List[str]] = None) -> List[Dict[str, Any]]:
+        """Get the options for the registry."""
+        registries = (
+            cls.get_registries()
+            if registries_names is None
+            else {name: cls.get_registries()[name] for name in registries_names}
+        )
+        options = {}
+        for name, registry in registries.items():
+            options[name] = registry.items()
+        options_listed: List[Dict[str, Any]] = list(*options.values())
+        return options_listed
+
+    @classmethod
+    def get_registry_arguments(cls, registries: List[str]) -> Dict[str, Any]:
         """Return the arguments for the subclass."""
-        dataclasses = {}
+        cls_registries = cls.get_registries()
+        cls_registries = {name: cls_registries[name] for name in registries}
+        arguments = {}
+        for name, registry in cls_registries.items():
+            options = cls.get_options([name])
+            print(options)
+            for option in options:
+                print(option)
+                print(registry.get_arguments(option))
+                for key in option.keys():
+                    arguments[name] = registry.get_arguments(key)
+        return arguments
 
-        RegistryClasses = AbstractRegistry.__subclasses__()
-        registries = {reg.__name__.lower(): reg for reg in RegistryClasses}
-        for name, selection in argument_classes.items():
-            for (registry, call) in selection.items():
-                dataclasses[name] = registries[registry].get_arguments(call)
+    @classmethod
+    def get_arguments(cls, registry: str, key: str, key_dict: Optional[Dict] = None, **kwargs) -> Any:
+        cls_registries = cls.get_registries()
+        return cls_registries[registry].get_arguments(key, key_dict, **kwargs)
 
-        return dataclasses
+        # dataclasses = {}
+
+        # RegistryClasses = AbstractRegistry.__subclasses__()
+        # registries = {reg.__name__.lower(): reg for reg in RegistryClasses}
+        # for name, selection in argument_classes.items():
+        #     for (registry, call) in selection.items():
+        #         dataclasses[name] = registries[registry].get_arguments(call)
+
+        # return dataclasses

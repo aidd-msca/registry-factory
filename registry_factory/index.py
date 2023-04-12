@@ -84,10 +84,10 @@ class HashTable(AbstractHash):
 
     def set_arguments(self, key: str, key_dict: Dict, arguments: Dataclass) -> None:
         full_key: Tuple[str, Dict] = (key, key_dict)
-        if full_key in self.slots.values() and full_key in self.arg_dict.values():
-            raise KeyError(f"{key}, {key_dict} arguments already exist in the registry.")
-        elif full_key in self.slots.values():
+        if full_key in self.slots.values():
             hash_value = self.get_hash(key, key_dict)
+            if hash_value in self.arg_dict.keys():
+                raise KeyError(f"{key}, {key_dict} arguments already exist in the registry.")
         else:
             hash_value = self.generate_hash()
             self.slots[hash_value] = full_key

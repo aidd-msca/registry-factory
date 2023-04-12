@@ -1,6 +1,7 @@
 """Test cases for Registry sharing.
 Author: PeterHartog
 """
+from dataclasses import dataclass
 import pytest
 from registry_factory.factory import Factory
 
@@ -44,11 +45,41 @@ class TestFactory:
             class _TestFactory(Factory):
                 TestRegistry = self.create_registry()
 
-    @pytest.mark.skip(reason="Todo: Implement this feature.")
+    def test_get_registries(self):
+        """Test getting all registries."""
+
+        class _TestFactory(Factory):
+            TestRegistry = Factory.create_registry()
+
+        assert "TestRegistry" in _TestFactory.get_registries().keys()
+
     def test_get_subclass_choices(self):
         """Test getting the subclass choices."""
 
         class _TestFactory(Factory):
             TestRegistry = Factory.create_registry()
 
-        assert _TestFactory.get_subclass_choices() == ["_TestFactory"]
+        @_TestFactory.TestRegistry.register("test")
+        def test():
+            pass
+
+        print(Factory)
+        import os
+
+        dir_path = os.path.dirname(os.path.realpath(Factory))
+        print(dir_path)
+
+        assert ("test", {}) in _TestFactory.items()
+
+    # def test_get_subclass_arguments(self):
+    #     """Test getting the subclass choices."""
+
+    #     class _TestFactory(Factory):
+    #         TestRegistry = Factory.create_registry()
+
+    #     @_TestFactory.TestRegistry.register_arguments("test_arg")
+    #     @dataclass
+    #     class TestArguments:
+    #         test_arg: str
+
+    #     assert TestArguments in _TestFactory.get_registry_arguments(["TestRegistry"]).values()

@@ -2,6 +2,7 @@
 from abc import ABC
 import warnings
 from typing import Any, Callable, List, Optional, Dict, Tuple
+from dataclasses import dataclass, is_dataclass
 
 # from registry_factory.tracker import Tracker
 from registry_factory.patterns.mediator import HashMediator
@@ -58,6 +59,22 @@ class AbstractRegistry(ABC):
         return f"{cls.__name__}({cls.mediator.hash_table.slots})"
 
     @classmethod
+    def items(cls) -> List[Tuple[Tuple[str, Dict], Any]]:
+        """Return a list of registered keys."""
+        hashes = [key for key in cls.mediator.hash_table.slots.keys()]
+        return [(cls.mediator.hash_table.slots[_hash], cls.mediator.hash_table.data[_hash]) for _hash in hashes]
+
+    @classmethod
+    def keys(cls) -> List[Tuple[str, Dict]]:
+        """Return a list of registered keys."""
+        return [(key, key_dict) for key, key_dict in cls.mediator.hash_table.slots.values()]
+
+    @classmethod
+    def values(cls) -> List[Any]:
+        """Return a list of registered keys."""
+        return [cls.mediator.hash_table.data.values()]
+
+    @classmethod
     def register(cls, key: str, **kwargs) -> Callable:
         """Register the object to the key with the option to use as a decorator."""
 
@@ -95,7 +112,7 @@ class AbstractRegistry(ABC):
     @classmethod
     def show_choices(cls) -> List[Tuple[str, Dict]]:
         """Returns the indexes of all registered objects."""
-        return list(cls.mediator.hash_table.slots.values())
+        return cls.keys()
 
     @classmethod
     def check_choice(cls, key: str, **kwargs) -> bool:
@@ -123,6 +140,13 @@ class AbstractRegistry(ABC):
         """Register the arguments to the key."""
 
         def wrapper(argument_class: Dataclass) -> Any:
+            if not is_dataclass(argument_class):
+                try:
+                    argument_class = dataclass(argument_class)  # type: ignore
+                except Exception:
+                    raise RegistrationError("The argument class must be a dataclass.")
+                else:
+                    warnings.warn(RegistrationWarning("The argument class has been converted to a dataclass."))
             key_dict = cls.mediator.generate_key_dict(key=key, **kwargs)
             cls.mediator.hash_table.set_arguments(key, key_dict, argument_class)
             return argument_class
@@ -130,9 +154,9 @@ class AbstractRegistry(ABC):
         return wrapper
 
     @classmethod
-    def get_arguments(cls, key: str, **kwargs) -> Dataclass:
+    def get_arguments(cls, key: str, key_dict: Optional[Dict] = None, **kwargs) -> Dataclass:
         """Return the arguments registered to the key."""
-        key_dict = cls.mediator.generate_key_dict(key=key, **kwargs)
+        key_dict = cls.mediator.generate_key_dict(key=key, **kwargs) if key_dict is None else key_dict
         return cls.mediator.hash_table.get_arguments(key, key_dict)
 
     # Legacy methods
