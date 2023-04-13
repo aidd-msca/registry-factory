@@ -2,6 +2,7 @@
 Author: PeterHartog
 """
 import pytest
+
 from registry_factory.checks.factory_pattern import FactoryPattern
 from registry_factory.factory import Factory
 

@@ -1,5 +1,6 @@
-from typing import Any, Callable, Dict, Optional, Tuple
 import warnings
+from typing import Any, Callable, Dict, Optional, Tuple
+
 from registry_factory.patterns.observer import RegistryObserver
 
 

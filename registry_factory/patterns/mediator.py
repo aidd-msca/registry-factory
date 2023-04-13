@@ -1,5 +1,6 @@
 """Mediator pattern implementation."""
 from typing import Any, Dict, Optional, Tuple
+
 from registry_factory.index import HashTable
 from registry_factory.patterns.facade import ObserverFacade
 
@@ -32,8 +33,6 @@ class HashMediator:
 
     def get_meta(self, key: str, **kwargs) -> Dict:
         key_dict = self.generate_key_dict(key=key, **kwargs)
-        print("heya")
-        print(key_dict)
         return self.hash_table.get_meta(key, key_dict)
 
 

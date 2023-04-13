@@ -2,10 +2,11 @@
 Author: PeterHartog
 """
 from typing import Any, Dict, Optional, Tuple
+
 import pytest
 
-from registry_factory.patterns.observer import RegistryObserver
 from registry_factory.factory import Factory
+from registry_factory.patterns.observer import RegistryObserver
 
 
 class TestObservers:

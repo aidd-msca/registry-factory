@@ -1,6 +1,7 @@
 """Call tracker."""
 
 from typing import Dict, Optional, Set
+
 from registry_factory.patterns.metacoding import Singleton
 
 __all__ = ["Tracker"]

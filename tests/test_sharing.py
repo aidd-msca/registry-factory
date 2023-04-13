@@ -2,8 +2,9 @@
 Author: PeterHartog
 """
 import pytest
-from registry_factory.utils import RegistrationError, RegistrationWarning
+
 from registry_factory.factory import Factory
+from registry_factory.utils import RegistrationError, RegistrationWarning
 
 
 class TestSharedRegistry:

@@ -1,6 +1,7 @@
-from typing import Any, List
-from registry_factory.patterns.observer import MetaInformationObserver
 from dataclasses import dataclass
+from typing import Any, List
+
+from registry_factory.patterns.observer import MetaInformationObserver
 
 
 @dataclass

@@ -1,8 +1,10 @@
 """Test cases for Registry meta information through versioning (other meta modules: accreditation).
 Author: PeterHartog
 """
-import pytest
 from dataclasses import dataclass
+
+import pytest
+
 from registry_factory.checks.versioning import Versioning
 from registry_factory.factory import Factory
 

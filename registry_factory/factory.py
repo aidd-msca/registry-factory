@@ -3,12 +3,12 @@
 
 from typing import Any, Dict, List, Optional, Tuple, Type
 
+from registry_factory.index import HashTable, RegistryTable
 from registry_factory.patterns.facade import ObserverFacade
 from registry_factory.patterns.mediator import HashMediator
 from registry_factory.patterns.observer import RegistryObserver
 from registry_factory.registry import AbstractRegistry
 from registry_factory.tracker import Tracker
-from registry_factory.index import RegistryTable, HashTable
 
 
 class Factory:
@@ -125,10 +125,7 @@ class Factory:
         arguments = {}
         for name, registry in cls_registries.items():
             options = cls.get_options([name])
-            print(options)
             for option in options:
-                print(option)
-                print(registry.get_arguments(option))
                 for key in option.keys():
                     arguments[name] = registry.get_arguments(key)
         return arguments

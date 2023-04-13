@@ -3,8 +3,9 @@ Author: PeterHartog
 """
 
 import pytest
-from registry_factory.utils import RegistrationError
+
 from registry_factory.factory import Factory
+from registry_factory.utils import RegistrationError
 
 
 class TestUnsharedRegistry:

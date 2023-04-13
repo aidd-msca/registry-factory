@@ -1,7 +1,6 @@
-from typing import Any, Dict, Optional, Tuple
-from types import FunctionType
-
 import warnings
+from types import FunctionType
+from typing import Any, Dict, Optional, Tuple
 
 from registry_factory.patterns.observer import RegistryObserver
 

@@ -2,7 +2,9 @@
 Author: PeterHartog
 """
 from typing import Any
+
 import pytest
+
 from registry_factory.checks.testing import Testing as _Testing
 from registry_factory.factory import Factory
 

@@ -1,10 +1,12 @@
 """Test cases for Registry arguments.
 Author: PeterHartog
 """
-import pytest
-from registry_factory.utils import RegistrationError, RegistrationWarning
-from registry_factory.factory import Factory
 from dataclasses import dataclass
+
+import pytest
+
+from registry_factory.factory import Factory
+from registry_factory.utils import RegistrationError, RegistrationWarning
 
 
 class TestArgumentsRegistry:
